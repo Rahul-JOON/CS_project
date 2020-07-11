@@ -2,4 +2,4 @@ import pygame
 
 input()
 
-print('m chutar hoon!')
+print('Helo Aliens')
