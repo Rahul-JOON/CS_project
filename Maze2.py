@@ -36,8 +36,7 @@ def maze():
     y=0
     for i in range(0,m*n):        
         if maze[x+(y*m)]==1:
-              
-        x=x+1
+            x=x+1
         if x>m-1:
             x=0
             y=y+1    

@@ -92,6 +92,7 @@ def maze1():
     for i in range(250,400,7):
         rect(i,350)
 maze1()      
+pygame.time.delay(10000)
 
     
 
