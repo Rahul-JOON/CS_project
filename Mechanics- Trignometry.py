@@ -3,8 +3,8 @@ import math as m
 
 p.init()
 
-win = p.display.set_mode((500, 500))
-p.display.set_caption("Mechanics")
+win = p.display.set_mode((1000, 700))
+p.display.set_caption("GUNMAN")
 
 run = True
 
@@ -16,13 +16,30 @@ class player():
         self.vel = 15
         self.deg = 0
         self.slantness = 0
+    
+class gun():
+    def __init__(self, x, y, radius, deg):
+        self.x = x 
+        self.y = y 
+        self.radius = radius 
+        self.deg = deg
+        self.vel = 10
+    def animate(self, win):
+        p.draw.circle(win, (255 ,255, 255), (self.x, self.y), self.radius)
+
 
 tank = player(200, 200, 40)
+bullets = []
 
 while run:
     p.time.delay(50)
 
-    print((tank.x, tank.y), round(m.sin(tank.deg) * tank.vel), m.cos(tank.deg) * tank.vel, tank.deg)
+    for b in bullets:
+        if b.y < 700 and b.y > 0 and b.x > 0 and b.x < 1000:
+            b.y -= round(m.cos(((m.pi)/180) * b.deg ) * b.vel)
+            b.x += round(m.sin(((m.pi)/180) * b.deg) * b.vel)
+        else :
+            bullets.pop(bullets.index(b))
 
     if tank.deg > 360:
         tank.deg = 1
@@ -46,8 +63,13 @@ while run:
     if keys[p.K_LEFT]:
         tank.deg -= 15
 
+    if keys[p.K_SPACE]:
+        bullets.append(gun(tank.x, tank.y, 10, tank.deg))
+
     win.fill((0, 0, 0))
     p.draw.circle(win, (155, 0, 0), (tank.x, tank.y), tank.radius)
+    for bullet in bullets:
+        bullet.animate(win)
     p.display.update()
 
 p.quit()
