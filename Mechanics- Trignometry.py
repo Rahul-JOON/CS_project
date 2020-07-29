@@ -29,6 +29,8 @@ class gun():
 
 
 tank = player(200, 200, 40)
+enemy = player(100, 100, 40)
+enemyt = True
 bullets = []
 
 while run:
@@ -40,6 +42,8 @@ while run:
             b.x += round(m.sin(((m.pi)/180) * b.deg) * b.vel)
         else :
             bullets.pop(bullets.index(b))
+        if round(((enemy.y - b.y)**2 + (enemy.x - b.x)**2)**(1/2)) <= enemy.radius:
+            enemyt = False
 
     if tank.deg > 360:
         tank.deg = 1
@@ -68,6 +72,8 @@ while run:
 
     win.fill((0, 0, 0))
     p.draw.circle(win, (155, 0, 0), (tank.x, tank.y), tank.radius)
+    if enemyt :
+        p.draw.circle(win, (0, 155, 0), (enemy.x, enemy.y), enemy.radius)
     for bullet in bullets:
         bullet.animate(win)
     p.display.update()
