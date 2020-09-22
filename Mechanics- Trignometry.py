@@ -1,5 +1,6 @@
 import pygame as p
 import math as m
+import os
 
 p.init()
 
@@ -13,9 +14,10 @@ class player():
         self.x = x 
         self.y = y
         self.radius = radius
-        self.vel = 15
+        self.vel = 7
         self.deg = 0
-        self.slantness = 0
+    def animate(self, win):
+        win.blit(p.image.load(os.path.join('Resources', f'ty{self.deg}.png')).convert() , (self.x, self.y) )
     
 class gun():
     def __init__(self, x, y, radius, deg):
@@ -25,7 +27,7 @@ class gun():
         self.deg = deg
         self.vel = 10
     def animate(self, win):
-        p.draw.circle(win, (255 ,255, 255), (self.x, self.y), self.radius)
+        p.draw.circle(win, (0 ,255, 255), (self.x, self.y), self.radius)
 
 
 tank = player(200, 200, 40)
@@ -35,8 +37,8 @@ bullets = []
 clock = p.time.Clock()
 
 while run:
-    p.time.delay(50)
-    clock.tick(60)
+    p.time.delay(35)
+    clock.tick(120)
     print(tank.deg)
 
 
@@ -49,10 +51,6 @@ while run:
         if round(((enemy.y - b.y)**2 + (enemy.x - b.x)**2)**(1/2)) <= enemy.radius:
             enemyt = False
 
-    if tank.deg == 360:
-        tank.deg = 0
-    elif tank.deg < 0:
-        tank.deg = 345
 
     for event in p.event.get():
         if event.type == p.QUIT:
@@ -72,14 +70,21 @@ while run:
         tank.deg -= 15
 
     if keys[p.K_SPACE]:
-        bullets.append(gun(tank.x, tank.y, 10, tank.deg))
+        bullets.append(gun(tank.x + 32, tank.y + 32, 5, tank.deg))
+    
+    if tank.deg == 360:
+        tank.deg = 0
+    elif tank.deg < 0:
+        tank.deg = 345
 
-    win.fill((0, 0, 0))
-    p.draw.circle(win, (155, 0, 0), (tank.x, tank.y), tank.radius)
-    if enemyt :
-        p.draw.circle(win, (0, 155, 0), (enemy.x, enemy.y), enemy.radius)
+    win.fill((255, 255, 255))
+    #p.draw.circle(win, (155, 0, 0), (tank.x, tank.y), tank.radius)
     for bullet in bullets:
         bullet.animate(win)
+    tank.animate(win)
+    if enemyt :
+        p.draw.circle(win, (0, 155, 0), (enemy.x, enemy.y), enemy.radius)
+    
     p.display.update()
 
 p.quit()
