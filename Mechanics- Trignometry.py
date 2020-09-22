@@ -32,9 +32,13 @@ tank = player(200, 200, 40)
 enemy = player(100, 100, 40)
 enemyt = True
 bullets = []
+clock = p.time.Clock()
 
 while run:
     p.time.delay(50)
+    clock.tick(60)
+    print(tank.deg)
+
 
     for b in bullets:
         if b.y < 700 and b.y > 0 and b.x > 0 and b.x < 1000:
@@ -45,10 +49,10 @@ while run:
         if round(((enemy.y - b.y)**2 + (enemy.x - b.x)**2)**(1/2)) <= enemy.radius:
             enemyt = False
 
-    if tank.deg > 360:
-        tank.deg = 1
+    if tank.deg == 360:
+        tank.deg = 0
     elif tank.deg < 0:
-        tank.deg = 359
+        tank.deg = 345
 
     for event in p.event.get():
         if event.type == p.QUIT:
