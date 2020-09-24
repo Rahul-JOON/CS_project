@@ -74,3 +74,4 @@ def maze():
             x=0
             y=y+1    
 maze()                
+pygame.time.delay(100000)
