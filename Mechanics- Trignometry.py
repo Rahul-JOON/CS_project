@@ -14,10 +14,10 @@ class player():
         self.x = x 
         self.y = y
         self.radius = radius
-        self.vel = 7
+        self.vel = 70
         self.deg = 0
     def animate(self, win):
-        win.blit(p.image.load(os.path.join('Resources', f'ty{self.deg}.png')).convert() , (self.x, self.y) )
+        win.blit(p.image.load(os.path.join('Resources', f'tr{self.deg}.png')).convert() , (self.x, self.y) )
     
 class gun():
     def __init__(self, x, y, radius, deg):
@@ -39,9 +39,7 @@ clock = p.time.Clock()
 while run:
     p.time.delay(35)
     clock.tick(120)
-    print(tank.deg)
-
-
+    
     for b in bullets:
         if b.y < 700 and b.y > 0 and b.x > 0 and b.x < 1000:
             b.y -= round(m.cos(((m.pi)/180) * b.deg ) * b.vel)
