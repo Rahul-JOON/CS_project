@@ -4,14 +4,14 @@ import os
 
 p.init()
 
-win = p.display.set_mode((1000, 700))
-p.display.set_caption("GUNMAN")
+win = p.display.set_mode((1400, 720))
+p.display.set_caption("Tank Busters")
 
 run = True
 
 class player():
     def __init__(self, x , y, radius):
-        self.x = x 
+        self.x = x
         self.y = y
         self.radius = radius
         self.vel = 7
@@ -75,7 +75,7 @@ while run:
     elif tank.deg < 0:
         tank.deg = 345
 
-    win.fill((255, 255, 255))
+    win.blit(p.image.load(os.path.join('Resources', 'bg.png')).convert() ,(0, 0))
     #p.draw.circle(win, (155, 0, 0), (tank.x, tank.y), tank.radius)
     for bullet in bullets:
         bullet.animate(win)
