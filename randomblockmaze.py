@@ -14,6 +14,14 @@ def newcolor():
     colorcodes = r.randint(0, 255)
     return colorcodes
 
+def returncoll(Rect, walls):
+    collisions = []
+    for wall in walls:
+        print(type(wall.dim))
+        if p.Rect.colliderect(wall.dim):
+            collisions.append(wall.dim)
+    return collisions
+
 class player():
     def __init__(self, x , y, radius):
         self.x = x 
@@ -21,6 +29,27 @@ class player():
         self.radius = radius
         self.vel = 7
         self.deg = 0
+        
+    def movement(self, tank, walls, displacement, direction):    
+        self.tank = tank
+        self.walls = walls
+        self.displacement = displacement
+        self.direction = direction
+        self.collisions = returncoll(self.tank, self.walls)
+        for wall in self.collisions:
+            if self.direction == 'h':
+                if self.displacement > 0:
+                    self.tank.right = wall.left
+                elif self.displacement < 0:
+                    self.tank.left = wall.right
+            if self.direction == 'v':
+                if self.displacement > 0:
+                    self.tank.bottom = wall.top
+                elif self.displacement < 0:
+                    self.tank.top = wall.bottom
+        return self.tank
+
+
     def animate(self, win):
         win.blit(p.image.load(os.path.join('Resources', f'tr{self.deg}.png')).convert() , (self.x, self.y) )
     
@@ -31,6 +60,7 @@ class gun():
         self.radius = radius 
         self.deg = deg
         self.vel = 10
+
     def animate(self, win):
         p.draw.circle(win, (0 ,255, 255), (self.x, self.y), self.radius)
 
@@ -40,7 +70,7 @@ class obstructions():
         self.y = r.randint(0, 700)
         self.width = r.randint(30, 64)
         self.height = r.randint(30, 128)
-        self.dim = (self.x, self.y, self.width, self.height)
+        self.dim = p.Rect(self.x, self.y, self.width, self.height)
 
     def animate(self, win):
         p.draw.rect(win, (newcolor(), newcolor(), newcolor()), self.dim)
@@ -51,8 +81,9 @@ enemy = player(100, 100, 40)
 enemyt = True
 bullets = []
 clock = p.time.Clock()
-wall = True
+wallt = True
 walls = []
+wall = obstructions()
 
 while run:
     p.time.delay(35)
@@ -68,10 +99,10 @@ while run:
             enemyt = False
 
 
-    if wall:
+    if wallt:
         for i in range(50):
             walls.append(obstructions())
-            wall = False
+        wallt = False
              
 
     for event in p.event.get():
@@ -81,7 +112,9 @@ while run:
 
     if keys[p.K_UP]:
         tank.y -= round(m.cos(((m.pi)/180) * tank.deg ) * tank.vel)
+        tank.movement(tank, walls, round(m.cos(((m.pi)/180) * tank.deg ) * tank.vel), 'v')
         tank.x += round(m.sin(((m.pi)/180) * tank.deg) * tank.vel)
+        tank.movement(tank, walls, round(m.sin(((m.pi)/180) * tank.deg) * tank.vel), 'h')
     if keys[p.K_DOWN]:
         tank.y += round(m.cos(((m.pi)/180) * tank.deg) * tank.vel)
         tank.x -= round(m.sin(((m.pi)/180) * tank.deg) * tank.vel)
