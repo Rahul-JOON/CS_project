@@ -37,6 +37,7 @@ bullets = []
 clock = p.time.Clock()
 
 while run:
+    print(tank.x, tank.y)
     p.time.delay(35)
     clock.tick(120)
     
