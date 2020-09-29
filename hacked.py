@@ -5,7 +5,7 @@ import os
 
 p.init()
 
-win = p.display.set_mode((1100, 700))
+win = p.display.set_mode((1000, 700))
 p.display.set_caption("TankBusters")
 
 run = True
@@ -38,9 +38,9 @@ class obstructions():
     def __init__(self):
         self.x = r.randint(0, 1436)
         self.y = r.randint(0, 700)
-        self.width = r.randint(30, 64)
-        self.height = r.randint(30, 128)
-        self.dim = (self.x, self.y, self.width, self.height)
+        self.width = r.randint(0, 64)
+        self.height = r.randint(0, 128)
+        self.dim = (self.x, self.y, self.height, self.width)
 
     def animate(self, win):
         p.draw.rect(win, (newcolor(), newcolor(), newcolor()), self.dim)
@@ -69,9 +69,8 @@ while run:
 
 
     if wall:
-        for i in range(50):
+        for i in range(5):
             walls.append(obstructions())
-            wall = False
              
 
     for event in p.event.get():
