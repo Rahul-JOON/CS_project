@@ -83,7 +83,7 @@ while run:
     tank.animate(win)
     if enemyt :
         p.draw.circle(win, (0, 155, 0), (enemy.x, enemy.y), enemy.radius)
-    
-    p.display.update()
+    p.display.flip()
+    #p.display.update()
 
 p.quit()
