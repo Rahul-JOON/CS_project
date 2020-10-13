@@ -10,16 +10,30 @@ p.display.set_caption("TankBusters")
 
 run = True
 
-def newcolor():
-    colorcodes = r.randint(0, 255)
-    return colorcodes
+def cornerfounder(tank, deg):
+    centre = (tank.x + 32, tank.y + 32)
+    initial = 45
+    corners = []
+    for i in range(4):
+        x = centre[0] + round(m.sin(((m.pi)/180) * (initial + deg)) * 45)
+        y = centre[1] + round(m.cos(((m.pi)/180) * (initial + deg)) * 45)
+        temptup = (x, y)
+        corners.append(temptup)
+        initial += 90
+    return corners
 
-def returncoll(tank, walls):
-    collisions = []
-    for wall in walls:
-        if tank.colliderect(wall.dim):
-            collisions.append(wall.dim)
-    return collisions
+def distancefinder(a, b):
+    dis = round(((a[0] - b[0])**2 + (a[1]-b[1])**2) ** 1/2)
+    return dis
+
+def areafinder(corners, point):
+    a = distancefinder(corners[0], corners[1])
+    b = distancefinder(corners[1], point)
+    c = distancefinder(point, corners[0])
+    s = (a + b + c) / 2 
+    area = (s*(s-a)*(s-b)*(s-c)) ** 0.5
+    return area
+
 
 class player():
     def __init__(self, x , y, width, height):
@@ -31,24 +45,18 @@ class player():
         self.deg = 0
         self.dim = p.Rect(self.x, self.y, self.width, self.height)
         
-    def movement(self, tank, walls, displacement, direction):    
+    def movementcheck(self, tank, walls, deg):    
         self.tank = tank
         self.walls = walls
-        self.displacement = displacement
-        self.direction = direction
-        self.collisions = returncoll(self.tank.dim, self.walls)
-        for wall in self.collisions:
-            if self.direction == 'h':
-                if self.displacement > 0:
-                    self.tank.x = wall[0] - 64
-                elif self.displacement < 0:
-                    self.tank.x = wall[0] + wall[2]
-            if self.direction == 'v':
-                if self.displacement > 0:
-                    self.tank.y = wall[1] + wall[3]
-                elif self.displacement < 0:
-                    self.tank.y = wall[1] + 64
-        return self.tank
+        self.deg = deg
+        if self.deg in [0, 90, 180, 360]:
+            for wall in self.walls:
+                if self.tank.dim.colliderect(wall.dim):
+                    return 'n'
+        else :
+            corners = cornerfounder(self.tank.dim, self.deg)
+            for wall in self.walls:
+                total_area = areafinder([corners[0], corners[1]], [wall.x, wall.y])
 
 
     def animate(self, win):
@@ -74,7 +82,7 @@ class obstructions():
         self.dim = (self.x, self.y, self.width, self.height)
 
     def animate(self, win):
-        p.draw.rect(win, (newcolor(), newcolor(), newcolor()), self.dim)
+        p.draw.rect(win, (0, 0, 0), self.dim)
 
 
 tank = player(200, 200, 64, 64)
@@ -96,13 +104,16 @@ while run:
             b.x += round(m.sin(((m.pi)/180) * b.deg) * b.vel)
         else :
             bullets.pop(bullets.index(b))
-        if round(((enemy.y - b.y)**2 + (enemy.x - b.x)**2)**(1/2)) <= enemy.radius:
-            enemyt = False
+        '''if round(((enemy.y - b.y)**2 + (enemy.x - b.x)**2)**(1/2)) <= enemy.radius:
+            enemyt = False'''
 
 
     if wallt:
-        for i in range(5):
-            walls.append(obstructions())
+        for i in range(50):
+            a = obstructions()
+            walls.append(a)
+            if tank.dim.colliderect(a.dim):
+                walls.remove(a)
         wallt = False
              
 
@@ -112,15 +123,27 @@ while run:
     keys = p.key.get_pressed()
 
     if keys[p.K_UP]:
+        tempx = tank.x
+        tempy = tank.y
         tank.y -= round(m.cos(((m.pi)/180) * tank.deg ) * tank.vel)
         tank.dim[1] = tank.y
-        tank.movement(tank, walls, round(m.cos(((m.pi)/180) * tank.deg ) * tank.vel), 'v')
+        if tank.movementcheck(tank, walls, tank.deg) == 'n':
+            tank.y = tempy
         tank.x += round(m.sin(((m.pi)/180) * tank.deg) * tank.vel)
         tank.dim[0] = tank.x
-        tank.movement(tank, walls, round(m.sin(((m.pi)/180) * tank.deg) * tank.vel), 'h')
+        if tank.movementcheck(tank, walls, tank.deg) == 'n':
+            tank.x = tempx
     if keys[p.K_DOWN]:
-        tank.y += round(m.cos(((m.pi)/180) * tank.deg) * tank.vel)
+        tempx = tank.x
+        tempy = tank.y
+        tank.y += round(m.cos(((m.pi)/180) * tank.deg ) * tank.vel)
+        tank.dim[1] = tank.y
+        if tank.movementcheck(tank, walls, tank.deg) == 'n':
+            tank.y = tempy
         tank.x -= round(m.sin(((m.pi)/180) * tank.deg) * tank.vel)
+        tank.dim[0] = tank.x
+        if tank.movementcheck(tank, walls, tank.deg) == 'n':
+            tank.x = tempx
 
     if keys[p.K_RIGHT]:
         tank.deg += 15
