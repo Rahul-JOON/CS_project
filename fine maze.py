@@ -10,31 +10,6 @@ p.display.set_caption("TankBusters")
 
 run = True
 
-def cornerfounder(tank, deg):
-    centre = (tank.x + 32, tank.y + 32)
-    initial = 45
-    corners = []
-    for i in range(4):
-        x = centre[0] + round(m.sin(((m.pi)/180) * (initial + deg)) * 45)
-        y = centre[1] + round(m.cos(((m.pi)/180) * (initial + deg)) * 45)
-        temptup = (x, y)
-        corners.append(temptup)
-        initial += 90
-    return corners
-
-def distancefinder(a, b):
-    dis = round(((a[0] - b[0])**2 + (a[1]-b[1])**2) ** 1/2)
-    return dis
-
-def areafinder(corners, point):
-    a = distancefinder(corners[0], corners[1])
-    b = distancefinder(corners[1], point)
-    c = distancefinder(point, corners[0])
-    s = (a + b + c) / 2 
-    area = (s*(s-a)*(s-b)*(s-c)) ** 0.5
-    return area
-
-
 class player():
     def __init__(self, x , y, width, height):
         self.x = x 
@@ -45,19 +20,12 @@ class player():
         self.deg = 0
         self.dim = p.Rect(self.x, self.y, self.width, self.height)
         
-    def movementcheck(self, tank, walls, deg):    
+    def movementcheck(self, tank, walls):    
         self.tank = tank
         self.walls = walls
-        self.deg = deg
-        if self.deg in [0, 90, 180, 360]:
-            for wall in self.walls:
-                if self.tank.dim.colliderect(wall.dim):
-                    return 'n'
-        else :
-            corners = cornerfounder(self.tank.dim, self.deg)
-            for wall in self.walls:
-                total_area = areafinder([corners[0], corners[1]], [wall.x, wall.y])
-
+        for wall in self.walls:
+            if self.tank.dim.colliderect(wall.dim):
+                return 'n' 
 
     def animate(self, win):
         win.blit(p.image.load(os.path.join('Resources', f'tr{self.deg}.png')).convert() , (self.x, self.y) )
@@ -69,6 +37,44 @@ class gun():
         self.radius = radius 
         self.deg = deg
         self.vel = 10
+
+    def bounce(self, bullet, walls):
+        self.bullet = bullet 
+        self.walls = walls
+        for wall in walls:
+            p1 = (wall.dim[0], wall.dim[1])
+            p2 = (wall.dim[0] + wall.dim[2], wall.dim[1])
+            p3 = (wall.dim[0] + wall.dim[2], wall.dim[1] + wall.dim[3])
+            p4 = (wall.dim[0], wall.dim[1] + wall.dim[3])
+            lines = [(p1, p2, wall.dim[2]), (p3, p4, wall.dim[2]), (p1, p4, wall.dim[3]), (p2, p3, wall.dim[3])]
+            for line in lines:
+                AB = [line[1][0] - line[0][0], line[1][1] - line[0][1]]
+                BE = [self.bullet.x - line[1][0], self.bullet.y - line[1][1]]
+                AE = [self.bullet.x - line[0][0], self.bullet.y - line[0][1]]
+                AB_BE = AB[0] * BE[0] + AB[1] * BE[1] 
+                AB_AE = AB[0] * AE[0] + AB[1] * AE[1]
+                distance = 0
+                if AB_BE > 0:
+                    y = self.bullet.y - line[1][1]
+                    x = self.bullet.x - line[1][0]
+                    distance = m.sqrt(x*x + y*y)
+                elif AB_AE < 0:
+                    y = self.bullet.y - line[0][1]
+                    x = self.bullet.x - line[0][0]
+                    distance = m.sqrt(x*x + y*y)
+                else:
+                    x1 = AB[0]
+                    y1 = AB[1]  
+                    x2 = AE[0]
+                    y2 = AE[1]
+                    mod = m.sqrt(x1 * x1 + y1 * y1);  
+                    distance = abs(x1 * y2 - y1 * x2) / mod
+                if distance <= self.radius:
+                    if line[0][0] == line[1][0]:
+                        self.bullet.deg = - self.bullet.deg
+                    else :
+                        self.bullet.deg = 180 - self.bullet.deg
+                    return 'done'
 
     def animate(self, win):
         p.draw.circle(win, (0 ,255, 255), (self.x, self.y), self.radius)
@@ -99,6 +105,8 @@ while run:
     clock.tick(120)
     
     for b in bullets:
+        x = b.bounce(b, walls)
+
         if b.y < 700 and b.y > 0 and b.x > 0 and b.x < 1000:
             b.y -= round(m.cos(((m.pi)/180) * b.deg ) * b.vel)
             b.x += round(m.sin(((m.pi)/180) * b.deg) * b.vel)
@@ -109,7 +117,7 @@ while run:
 
 
     if wallt:
-        for i in range(50):
+        for i in range(25):
             a = obstructions()
             walls.append(a)
             if tank.dim.colliderect(a.dim):
@@ -127,22 +135,22 @@ while run:
         tempy = tank.y
         tank.y -= round(m.cos(((m.pi)/180) * tank.deg ) * tank.vel)
         tank.dim[1] = tank.y
-        if tank.movementcheck(tank, walls, tank.deg) == 'n':
+        if tank.movementcheck(tank, walls) == 'n':
             tank.y = tempy
         tank.x += round(m.sin(((m.pi)/180) * tank.deg) * tank.vel)
         tank.dim[0] = tank.x
-        if tank.movementcheck(tank, walls, tank.deg) == 'n':
+        if tank.movementcheck(tank, walls) == 'n':
             tank.x = tempx
     if keys[p.K_DOWN]:
         tempx = tank.x
         tempy = tank.y
         tank.y += round(m.cos(((m.pi)/180) * tank.deg ) * tank.vel)
         tank.dim[1] = tank.y
-        if tank.movementcheck(tank, walls, tank.deg) == 'n':
+        if tank.movementcheck(tank, walls) == 'n':
             tank.y = tempy
         tank.x -= round(m.sin(((m.pi)/180) * tank.deg) * tank.vel)
         tank.dim[0] = tank.x
-        if tank.movementcheck(tank, walls, tank.deg) == 'n':
+        if tank.movementcheck(tank, walls) == 'n':
             tank.x = tempx
 
     if keys[p.K_RIGHT]:
@@ -158,7 +166,7 @@ while run:
     elif tank.deg < 0:
         tank.deg = 345
 
-    win.fill((255, 255, 255))
+    win.fill((0, 255, 0))
     for wal in walls:
         wal.animate(win)
     for bullet in bullets:
