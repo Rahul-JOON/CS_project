@@ -645,7 +645,7 @@ def exit1():
 # All executions
 menu_page()
 root.iconify()
-
+startup()
 root.deiconify()
 
 
