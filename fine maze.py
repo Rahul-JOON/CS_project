@@ -28,7 +28,7 @@ class player():
                 return 'n' 
 
     def animate(self, win):
-        win.blit(p.image.load(os.path.join('Resources', f'tr{self.deg}.png')).convert() , (self.x, self.y) )
+        win.blit(p.image.load(os.path.join('Resources/Tanks Animations', f'tr{self.deg}.png')).convert() , (self.x, self.y) )
     
 class gun():
     def __init__(self, x, y, radius, deg):
