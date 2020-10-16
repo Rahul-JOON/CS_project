@@ -122,9 +122,6 @@ while run:
             walls.append(a)
             if tank.dim.colliderect(a.dim):
                 walls.remove(a)
-            for j in walls:
-                if p.rect(j.dim).colliderect(a.dim):
-                    walls.remove(a)
         wallt = False
              
 
