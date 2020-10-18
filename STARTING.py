@@ -1,4 +1,5 @@
 from tkinter import *
+import tkinter.font as font
 from PIL import ImageTk,Image
 import imageio
 from pathlib import Path
@@ -6,6 +7,11 @@ import pygame as p
 import random as r
 import math as m
 import os
+global player1_score
+global player2_score
+player1_score=0
+player2_score=0
+
 
 p.mixer.init()
 
@@ -88,19 +94,67 @@ def start():
     
 
     # Game to start in this function
-    def END_GAME():
+    
         
-        top2=Tk()
-        top2.title("TankBusters")
-        top2.iconbitmap('tank.ico')
-        global imgend
-        imgend=ImageTk.PhotoImage(Image.open("end.png"))
-        labelre=Label(top2,image=imgend)
-        labelre.grid(row=0,column=0)
-        top2.mainloop()
-        
-    def MAIN_GAME():
-        root.destroy()
+    def MAIN_GAME(player1_score,player2_score):
+        def END_GAME(player1_score,player2_score):
+           
+            def menu():
+                root=Tk()
+                root.title("TankBusters")
+                root.iconbitmap('tank.ico')
+                root.geometry("1280x720")
+                root.configure(bg="brown")
+                menu_page()
+            def quitz():
+                top2.destroy()
+
+            def again():
+                top2.destroy()
+                MAIN_GAME(player1_score,player2_score)    
+            top2=Tk()
+            top2.title("TankBusters")
+            top2.iconbitmap('tank.ico')
+            top2.configure(bg="brown")
+            global imgend
+            imgend=ImageTk.PhotoImage(Image.open("score.png"))
+            labelre=Label(top2,image=imgend)
+            labelre.grid(row=0,column=0,rowspan=2,columnspan=6)
+                
+            if tank1y==False:
+                player2_score+=1
+            if tank2y==False:
+                player1_score+=1
+
+            myFont = font.Font(family='Helvetica', size=40, weight='bold')
+            img1score=ImageTk.PhotoImage(Image.open("player 1 score.png"))
+            score1=Label(image=img1score)
+            score1.grid(row=3,column=1)
+            score11=Label(text=player1_score)
+            score11.grid(row=4,column=1)
+            score11['font'] = myFont
+            img2score=ImageTk.PhotoImage(Image.open("player 2 score.png"))
+
+            score2=Label(image=img2score)
+            score2.grid(row=3,column=3)
+            score22=Label(text=player2_score)
+            score22['font'] = myFont
+            score22.grid(row=4,column=3)
+                
+            imgagain=ImageTk.PhotoImage(Image.open("play again.png"))
+            play_again=Button(top2,image=imgagain,command=again)
+            play_again.grid(row=5,column=2)
+                
+            imgquitm=ImageTk.PhotoImage(Image.open("quit menu.png"))
+            Quit_menu=Button(top2,image=imgquitm,command=menu)
+            Quit_menu.grid(row=6,column=1)
+                
+            imgquitd=ImageTk.PhotoImage(Image.open("quit desktop.png"))
+            play_again=Button(top2,image=imgquitd,command=quitz)
+            play_again.grid(row=6,column=3)
+
+                
+            top2.mainloop()
         
 
         p.init()
@@ -195,8 +249,10 @@ def start():
 
 
         tank1 = player(200, 200, 64, 64)
+        global tank1y
         tank1y=True
         tank2 = player(200, 200, 64, 64)
+        global tank2y
         tank2y=True
         
         bullets1 = []
@@ -333,19 +389,22 @@ def start():
             tank2.animate(win)
             if tank1y==False :
                 p.draw.rect(win, (0, 155, 0), (tank1.x, tank1.y, tank1.width, tank1.height))
-                END_GAME()
+                
                 run = False
             
             if tank2y==False :
                 p.draw.rect(win, (0, 155, 0), (tank2.x, tank2.y, tank2.width, tank2.height))
-                END_GAME()
+                
                 run=False
                 
             
             p.display.flip()
 
         p.quit()
+        
 
+        
+        END_GAME(player1_score,player2_score)
     def color2():
         tanklabel1.destroy()
         tanker_name1.destroy()
@@ -374,6 +433,11 @@ def start():
 
             def namesub2():
                 player_name2=tanker_name2.get()
+            def GAME():
+                 
+                
+                root.destroy()
+                MAIN_GAME(0,0)    
             
             
             global imgt2
@@ -396,7 +460,7 @@ def start():
             global imgst2
             imgst2=ImageTk.PhotoImage(Image.open("start game.png"))
             global start
-            start2=Button(root,image=imgst2,command=MAIN_GAME)
+            start2=Button(root,image=imgst2,command=GAME)
             start2.grid(row=6,column=7)
             
             
@@ -645,7 +709,7 @@ def exit1():
 # All executions
 menu_page()
 root.iconify()
-startup()
+
 root.deiconify()
 
 
