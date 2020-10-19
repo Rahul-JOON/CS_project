@@ -61,7 +61,7 @@ def menu_page():
         
     img=ImageTk.PhotoImage(Image.open(os.path.join('Resources/Banners', 'start .png')))
     global Play_button
-    Play_button=Button(image=img,command=start,padx=5)
+    Play_button=Button(image=img,command=selection,padx=5)
     Play_button.configure(highlightthickness=0)    
     Play_button.grid(row=0,column=6)
 
@@ -82,13 +82,22 @@ def menu_page():
     exit_button.configure(highlightthickness=0)
     exit_button.grid(row=2,column=6)
     
-# The function of the start button    
-def start():
+# The function of the start button
+def selection():
     menulbl.destroy()
-    
     Play_button.destroy()
     settings_button.destroy()
     exit_button.destroy()
+
+    global imgsingle
+    imgsingle=ImageTk.PhotoImage(Image.open(os.path.join('Resources/Banners', "single.png")))
+    global single_button
+    single_button=Button(image=imgsingle,command=start)
+    single_button.configure(highlightthickness=0)
+    single_button.grid(row=0,column=0,padx=350,pady=100)
+
+def start():
+    single_button.destroy()
     
 
     # Game to start in this function
@@ -105,7 +114,10 @@ def start():
         
     def MAIN_GAME(player1_score,player2_score):
         def END_GAME(player1_score,player2_score):
-           
+            if tank1y==False:
+                player2_score+=1
+            if tank2y==False:
+                player1_score+=1
             def menu():
                 root=Tk()
                 root.title("TankBusters")
@@ -114,6 +126,13 @@ def start():
                 root.configure(bg="brown")
                 menu_page()
             def quitz():
+                def data():
+                    writer=open("data.txt","a+")
+                    line=player_name1+" = "+str(player1_score)+"    "+player_name2+" = "+str(player2_score)+"\n"
+                          
+                    writer.write(line)        
+                    writer.close()
+                data()
                 top2.destroy()
 
             def again():
@@ -128,10 +147,7 @@ def start():
             labelre=Label(top2,image=imgend)
             labelre.grid(row=0,column=0,rowspan=2,columnspan=6)
                 
-            if tank1y==False:
-                player2_score+=1
-            if tank2y==False:
-                player1_score+=1
+            
 
             myFont = font.Font(family='Helvetica', size=40, weight='bold')
             img1score=ImageTk.PhotoImage(Image.open("player 1 score.png"))
@@ -171,9 +187,9 @@ def start():
         win.fill((255,255,255))
         run = True
 
-        tank1 = player(200, 200, 64, 64)
+        tank1 = player(200, 200, 64, 64, tank_color1)
         tank1y=True
-        tank2 = player(200, 200, 64, 64)
+        tank2 = player(800, 400, 64, 64, tank_color2)
         tank2y=True
         
         bullets1 = []
@@ -182,9 +198,14 @@ def start():
         wallt = True
         walls = []
         wall = obstructions()
-
-
+        font2=p.font.Font('freesansbold.ttf', 18)
+        text1 = font2.render(player_name1, True, (0,0,0), (255,218,185))
+        textRect1 = text1.get_rect()
+        text2 = font2.render(player_name2, True, (0,0,0), (255,218,185))
+        textRect2 = text2.get_rect() 
         while run:
+            textRect1.center = (tank1.x+32,tank1.y-10)
+            textRect2.center = (tank2.x+32,tank2.y-10)
             p.time.delay(35)
             clock.tick(120)
             
@@ -218,6 +239,8 @@ def start():
                     walls.append(a)
                     if tank1.dim.colliderect(a.dim):
                         walls.remove(a)
+                    if tank2.dim.colliderect(a.dim):
+                        walls.remove(a)    
                         
                 wallt = False
                      
@@ -308,6 +331,9 @@ def start():
                 bullet2.animate(win)    
             tank1.animate(win)
             tank2.animate(win)
+            win.blit(text1, textRect1)
+            win.blit(text2, textRect2)
+            p.display.update()
             if tank1y==False :
                 p.draw.rect(win, (0, 155, 0), (tank1.x, tank1.y, tank1.width, tank1.height))
             
@@ -350,6 +376,7 @@ def start():
             colorsee2.destroy()
 
             def namesub2():
+                global player_name2
                 player_name2=tanker_name2.get()
             
             def GAME():
@@ -380,7 +407,7 @@ def start():
             start2.grid(row=6,column=7)
             
             
-        global tank_color2
+        global color2
         color2=""
         def colorz2(color2):
             global tank_color2
@@ -388,31 +415,31 @@ def start():
             
         
         def color22():
-            if tank_color2=="red":        
+            if tank_color2=="r":        
                 global imgr2
                 imgr2=ImageTk.PhotoImage(Image.open(os.path.join('Resources/Banners', "red.png")))
                 global showcolor11
                 showcolor11=Label(image=imgr2)
                 showcolor11.grid(row=5,column=2)
-            if tank_color2=="blue":
+            if tank_color2=="b":
                 global imgb2
                 imgb2=ImageTk.PhotoImage(Image.open(os.path.join('Resources/Banners', "blue.png")))
                 global showcolor22
                 showcolor22=Label(image=imgb2)
                 showcolor22.grid(row=5,column=2)
-            if tank_color2=="green":
+            if tank_color2=="g":
                 global imgg2
                 imgg2=ImageTk.PhotoImage(Image.open(os.path.join('Resources/Banners', "green.png")))
                 global showcolor33
                 showcolor33=Label(image=imgg2)
                 showcolor33.grid(row=5,column=2)
-            if tank_color2=="white":
+            if tank_color2=="w":
                 global imgw2
                 imgw2=ImageTk.PhotoImage(Image.open(os.path.join('Resources/Banners', "white.png")))
                 global showcolor44
                 showcolor44=Label(image=imgw2)
                 showcolor44.grid(row=5,column=2)
-            if tank_color2=="yellow":
+            if tank_color2=="y":
                 global imgy2
                 imgy2=ImageTk.PhotoImage(Image.open(os.path.join('Resources/Banners', "yellow.png")))
                 global showcolor55
@@ -424,19 +451,19 @@ def start():
         choice2=Label(image=imgx2)
         choice2.grid(row=0,column=0,rowspan=2,columnspan=9,padx=200)
 
-        blue2=Button(root,bg="blue",width=20,height=10,command=lambda:colorz2("blue"))
+        blue2=Button(root,bg="blue",width=20,height=10,command=lambda:colorz2("b"))
         blue2.grid(row=3,column=1,pady=5)
 
-        red2=Button(root,bg="red",width=20,height=10,command=lambda:colorz2("red"))
+        red2=Button(root,bg="red",width=20,height=10,command=lambda:colorz2("r"))
         red2.grid(row=3,column=4,pady=5)
 
-        green2=Button(root,bg="green",width=20,height=10,command=lambda:colorz2("green"))
+        green2=Button(root,bg="green",width=20,height=10,command=lambda:colorz2("g"))
         green2.grid(row=3,column=7,pady=5)
 
-        white2=Button(root,bg="white",width=20,height=10,command=lambda:colorz2("white"))
+        white2=Button(root,bg="white",width=20,height=10,command=lambda:colorz2("w"))
         white2.grid(row=4,column=2,pady=30)
 
-        yellow2=Button(root,bg="yellow",width=20,height=10,command=lambda:colorz2("yellow"))
+        yellow2=Button(root,bg="yellow",width=20,height=10,command=lambda:colorz2("y"))
         yellow2.grid(row=4,column=5,pady=30)
 
         global imgchosen2
@@ -451,6 +478,7 @@ def start():
         
         
     def namesub1():
+        global player_name1
         player_name1=tanker_name1.get()
 
     def name():
@@ -504,49 +532,49 @@ def start():
 
 
     # Option buttons for all the colors
-    blue=Button(root,bg="blue",width=20,height=10,command=lambda:colorz("blue"))
+    blue=Button(root,bg="blue",width=20,height=10,command=lambda:colorz("b"))
     blue.grid(row=3,column=1,pady=5)
 
-    red=Button(root,bg="red",width=20,height=10,command=lambda:colorz("red"))
+    red=Button(root,bg="red",width=20,height=10,command=lambda:colorz("r"))
     red.grid(row=3,column=4,pady=5)
 
-    green=Button(root,bg="green",width=20,height=10,command=lambda:colorz("green"))
+    green=Button(root,bg="green",width=20,height=10,command=lambda:colorz("g"))
     green.grid(row=3,column=7,pady=5)
 
-    white=Button(root,bg="white",width=20,height=10,command=lambda:colorz("white"))
+    white=Button(root,bg="white",width=20,height=10,command=lambda:colorz("w"))
     white.grid(row=4,column=2,pady=30)
 
-    yellow=Button(root,bg="yellow",width=20,height=10,command=lambda:colorz("yellow"))
+    yellow=Button(root,bg="yellow",width=20,height=10,command=lambda:colorz("y"))
     yellow.grid(row=4,column=5,pady=30)
 
     root.update()
 
     def color():
-        if tank_color1=="red":        
+        if tank_color1=="r":        
             global imgr
             imgr=ImageTk.PhotoImage(Image.open(os.path.join('Resources/Banners', "red.png")))
             global showcolor1
             showcolor1=Label(image=imgr)
             showcolor1.grid(row=5,column=2)
-        if tank_color1=="blue":
+        if tank_color1=="b":
             global imgb
             imgb=ImageTk.PhotoImage(Image.open(os.path.join('Resources/Banners', "blue.png")))
             global showcolor2
             showcolor2=Label(image=imgb)
             showcolor2.grid(row=5,column=2)
-        if tank_color1=="green":
+        if tank_color1=="g":
             global imgg
             imgg=ImageTk.PhotoImage(Image.open(os.path.join('Resources/Banners', "green.png")))
             global showcolor3
             showcolor3=Label(image=imgg)
             showcolor3.grid(row=5,column=2)
-        if tank_color1=="white":
+        if tank_color1=="w":
             global imgw
             imgw=ImageTk.PhotoImage(Image.open(os.path.join('Resources/Banners', "white.png")))
             global showcolor4
             showcolor4=Label(image=imgw)
             showcolor4.grid(row=5,column=2)
-        if tank_color1=="yellow":
+        if tank_color1=="y":
             global imgy
             imgy=ImageTk.PhotoImage(Image.open(os.path.join('Resources/Banners', "yellow.png")))
             global showcolor5
@@ -581,12 +609,29 @@ def settings():
     setting=Label(image=imgA)
     setting.grid(row=0,column=6)
 
+    def opendata():
+        def opend():
+            try:
+                reader=open("data.txt","r")
+            except:
+                pass
+            scores=reader.read()
+            my_text.insert(END,scores)
+        top2=Toplevel()
+        top2.title("Tank Busters Score")
+        my_text=Text(top2,width=50,height=10,font=("Helvetica",16))
+        opend()
+        my_text.pack(pady=20)
+            
+        
+
     def back():
         menulbl.destroy()
         musicon.destroy()
         musicoff.destroy()
         setting.destroy()
         back_button.destroy()
+        scores_button.destroy()
         menu_page()
 
     def play():
@@ -606,7 +651,12 @@ def settings():
     musicoff=Button(root,image=imgm2,command=stop)  
     musicoff.grid(row=2,column=6)
     root.update()
-        
+
+    global imgscore
+    imgscore=ImageTk.PhotoImage(Image.open(os.path.join('Resources/Banners', "scores.png")))
+    scores_button=Button(root,image=imgscore,command=opendata)
+    scores_button.configure(highlightthickness=0)
+    scores_button.grid(row=3,column=6)   
     
     
     global imgB
@@ -625,7 +675,7 @@ def exit1():
 # All executions
 menu_page()
 root.iconify()
-startup()
+
 root.deiconify()
 
 

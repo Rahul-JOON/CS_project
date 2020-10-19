@@ -5,7 +5,7 @@ import math as m
 import os
 
 class player():
-            def __init__(self, x , y, width, height):
+            def __init__(self, x , y, width, height, color):
                 self.x = x 
                 self.y = y
                 self.height = height
@@ -13,7 +13,7 @@ class player():
                 self.vel = 7
                 self.deg = 0
                 self.dim = p.Rect(self.x, self.y, self.width, self.height)
-                
+                self.color=color
             def movementcheck(self, tank, walls):    
                 self.tank = tank
                 self.walls = walls
@@ -22,7 +22,7 @@ class player():
                         return 'n' 
 
             def animate(self, win):
-                win.blit(p.image.load(os.path.join('Resources/Tanks Animations', f'tr{self.deg}.png')).convert() , (self.x, self.y) )
+                win.blit(p.image.load(os.path.join('Resources/Tanks Animations', f't{self.color}{self.deg}.png')).convert() , (self.x, self.y) )
             
 class gun():
             def __init__(self, x, y, radius, deg):
